@@ -60,7 +60,11 @@ def allele_count_to_logR(tumor_file,
     merged['tumor_logR'] = np.log2(merged['tumor_R']/np.average(merged['tumor_R']))
     merged['normal_logR'] = 0
 
-    merged.index = merged['chr'] + merged['pos'].astype(str)
+    merged['chr'] = [c.split('chr')[-1] for c in merged['chr']]
+
+    merged.index = merged['chr'] + '_' + merged['pos'].astype(str)
+    merged = merged.sort_values(by=['chr','pos','tumor_logR'])
+    merged = merged[~merged.index.duplicated(keep='last')]
 
     tumor_out_file = merged[['chr','pos','tumor_logR']]
     tumor_out_file.columns = ['chrs','pos',sample]

@@ -41,7 +41,11 @@ def allele_count_to_BAF(ref_snp_csv,
     annot_df['baf'] = annot_df['alt_count'] / (annot_df['ref_count'] + annot_df['alt_count'])
 
     out_df = annot_df[['chr','pos','baf']].reset_index(drop=True).dropna()
-    out_df.index = out_df['chr'] + out_df['pos'].astype(str)
+    out_df = out_df.sort_values(by=['chr','pos','baf'])
+
+    out_df['chr'] = [c.split('chr')[-1] for c in out_df['chr']]
+    out_df.index = out_df['chr'] + '_' + out_df['pos'].astype(str)
     out_df.columns = ['chrs','pos',sample]
+    out_df = out_df[~out_df.index.duplicated(keep='last')]
     out_df.to_csv('{}/{}_{}_BAF.txt'.format(out_dir,sample,sample_type),
                    sep='\t')
