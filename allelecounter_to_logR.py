@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import argparse
 
 def allele_count_to_logR(tumor_file,
                          normal_file,
@@ -29,6 +30,7 @@ def allele_count_to_logR(tumor_file,
         Sample name.
 
     '''
+    print('Reading tumor')
     tumor = pd.read_csv(tumor_file,
                          sep='\t',
                          skiprows=1,
@@ -39,7 +41,7 @@ def allele_count_to_logR(tumor_file,
                                 'G',
                                 'T',
                                 'DP'])
-
+    print('Reading normal')
     normal = pd.read_csv(normal_file,
                          sep='\t',
                          skiprows=1,
@@ -50,7 +52,7 @@ def allele_count_to_logR(tumor_file,
                                 'G',
                                 'T',
                                 'DP'])
-
+    print('Merging files')
     merged = tumor.merge(normal,on=['chr','pos'],
                          suffixes=('_tumor','_normal'))
 
@@ -68,8 +70,33 @@ def allele_count_to_logR(tumor_file,
 
     tumor_out_file = merged[['chr','pos','tumor_logR']]
     tumor_out_file.columns = ['chrs','pos',sample]
-    tumor_out_file.to_csv('{}/{}_Tumor_LogR.txt'.format(out_dir,sample),sep='\t')
+    tumor_file_name = '{}/{}_Tumor_LogR.txt'.format(out_dir,sample)
+    tumor_out_file.to_csv(tumor_file_name,sep='\t')
+    print('Wrote tumor file {}'.format(tumor_file_name))
 
     normal_out_file = merged[['chr','pos','normal_logR']]
     normal_out_file.columns = ['chrs','pos',sample]
-    normal_out_file.to_csv('{}/{}_Normal_LogR.txt'.format(out_dir,sample),sep='\t')
+    normal_file_name = '{}/{}_Normal_LogR.txt'.format(out_dir,sample)
+    normal_out_file.to_csv(normal_file_name ,sep='\t')
+    print('Wrote normal file {}'.format(normal_file_name))
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-t", "--tumor", help="Tumor AlleleCounter File")
+parser.add_argument("-n", "--normal", help="Normal AlleleCounter File")
+parser.add_argument("-o", "--out_dir", help="Output directory")
+parser.add_argument("-s", "--sample", help="Sample name")
+
+args = parser.parse_args()
+
+print( "Sample: {}\nTumor: {}\nNormal: {}\nOutput directory: {}".format(
+        args.sample,
+        args.tumor,
+        args.normal,
+        args.out_dir
+        ))
+
+allele_count_to_logR(tumor_file=args.tumor,
+                     normal_file=args.normal,
+                     out_dir=args.out_dir,
+                     sample=args.sample)
