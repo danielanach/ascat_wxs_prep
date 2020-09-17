@@ -24,3 +24,10 @@ Using allele count output files separately on paired normal / tumor samples and 
 python allelecounter_to_baf.py --allele_count A047-tumor-allelecount.txt  --ref_snp_csv 1000G_Exome_baSNPs.csv  -o ../ --sample A047 --type Tumor
 python allelecounter_to_baf.py --allele_count A047-normal-allelecount.txt  --ref_snp_csv 1000G_Exome_baSNPs.csv  -o ../ --sample A047 --type Normal
 ```
+
+## Dependencies
+
+Tested with:
+* numpy 1.18.3
+* pandas 1.0.3
+* python 3.7.6 
