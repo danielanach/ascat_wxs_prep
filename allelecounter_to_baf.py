@@ -36,7 +36,7 @@ def allele_count_to_BAF(ref_snp_csv,
                             'T',
                             'DP'])
     print('Intersecting reference SNPs and allele counts')
-    annot_df = df.merge(ref_snp_df)
+    annot_df = df.merge(ref_snp_df,how='inner')
 
     print('Computing BAF')
     annot_df['ref_count'] = [annot_df[annot_df['ref'][i]][i] for i in annot_df.index]

@@ -5,7 +5,8 @@ import argparse
 def allele_count_to_logR(tumor_file,
                          normal_file,
                          out_dir,
-                         sample):
+                         sample,
+                         ref_snp_csv):
     ''' Takes allele count data from AlleleCounter and SNP loci and writes
     logR file formatted for use with ASCAT.
 
@@ -56,6 +57,11 @@ def allele_count_to_logR(tumor_file,
     merged = tumor.merge(normal,on=['chr','pos'],
                          suffixes=('_tumor','_normal'))
 
+    print('Loading reference SNPs')
+    ref_snp_df = pd.read_csv(ref_snp_csv)
+    merged = merged.merge(ref_snp_df,how='inner')
+
+
     merged['tumor_R'] = np.divide(merged['DP_tumor'],
                                     merged['DP_normal']).replace([np.inf, -np.inf], np.nan)
     merged = merged.dropna(subset=['tumor_R'])
@@ -82,6 +88,7 @@ def allele_count_to_logR(tumor_file,
 
 parser = argparse.ArgumentParser()
 
+parser.add_argument("-r", "--ref_snp_csv", help="File name for file containing the 1000G SNPs to profile")
 parser.add_argument("-t", "--tumor", help="Tumor AlleleCounter File")
 parser.add_argument("-n", "--normal", help="Normal AlleleCounter File")
 parser.add_argument("-o", "--out_dir", help="Output directory")
@@ -99,4 +106,5 @@ print( "Sample: {}\nTumor: {}\nNormal: {}\nOutput directory: {}".format(
 allele_count_to_logR(tumor_file=args.tumor,
                      normal_file=args.normal,
                      out_dir=args.out_dir,
-                     sample=args.sample)
+                     sample=args.sample,
+                     ref_snp_csv = args.ref_snp_csv)
